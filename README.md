@@ -1,8 +1,8 @@
 #Recordling
 ##A package for recording performances and playing them back again.
-Originally designed for use with [Voxel.js](http://voxeljs.com) motion capture using my own [voxel-zigfu](https://github.com/flyswatter/voxel-zigfu#readme), but then I realized its API was open-ended enough that it could potentially be a recorder for anything.
+Originally designed for use with [Voxel.js](http://voxeljs.com) motion capture using my own [voxel-zigfu](https://github.com/flyswatter/voxel-zigfu#readme), I found its API was open-ended enough that it could potentially be a recorder for anything.
 
-The name is a tribute to Substack, and because I needed a vague name once I realized it was flexible.
+The name is a tribute to Substack.
 
 ###Example
 	var recorder = require('animation-recorder')
@@ -54,6 +54,12 @@ Registers an actor with a callback for recording and playing back.
 
 ###stopRecording()
 
+###unregister(actor)
+Stops recording the given actor in subsequent recordings.
+
+###removePerformanceBy(actor)
+Removes any performance by the given actor.
+
 ###recordingLength()
 Returns recording length in milliseconds.
 
@@ -88,10 +94,4 @@ A positive or negative number representing the speed at which to play back when 
 Must be called each frame for animation to be captured or performances to be displayed.
 
 ###frameSafe(bool)
-Tells playback engine whether to render every frame regardless of time or not.  Defaults to false, preserving timing accuracy.
-
-###unregister(actor)
-Stops recording the given actor in subsequent recordings.
-
-###removePerformanceBy(actor)
-Removes any performance by the given actor.
+Tells playback engine whether to render every frame regardless of time or not.  Defaults to true, neglecting timing accuracy but staying wary of what is probably a pretty sketchy playback attempt.  I would only turn this on if I had a really amazing computer to try it on.

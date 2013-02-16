@@ -7,7 +7,8 @@ var recording = [],
 	speed = 1,
 	recordingLength = 0,
 	timeStartedRecording = timeStartedPlaying = Date.now(),
-	playingFromFrame = 0
+	playingFromFrame = 0,
+	preserveAllFrames = false
 
 exports.register = function(actor, recordingMethod, playbackMethod){
 	actors.push({
@@ -102,7 +103,6 @@ exports.clearRecording = function(){
 	recording = []
 }
 
-var preserveAllFrames = false
 exports.frameSafe = function(safeOrNot){
 	preserveAllFrames = safeOrNot
 }
