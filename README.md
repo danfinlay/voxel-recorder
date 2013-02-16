@@ -21,20 +21,27 @@
 ##API##
 ###register(actor, recordingCallback, playbackCallback)
 Registers an actor with a callback for recording and playing back.
-recordingCallback has reference to the registered actor.  Does Javscript do that gracefully?
-recordingCallback wants to be returned an object that represents all information needed to reenact that actor.  This object is then returned along with a reference to the original actor in the playbackCallback.
-	recorder.register(voxelSkinA, recordingMethod, playbackMethod)
 
-	function recordingMethod(actor){
-		return actor.leftArm.position
+	function recordingCallback(actor){
+
+		//Includes a reference to the recorded actor.
+		//You should return an object that your actor will use
+		//to reenact its current position.
+		return {
+			'leftArm':{
+					'position':actor.leftArm.position
+				}
+			}
 	}
 
 	function playbackMethod(actor, positionData){
+		//Includes a reference both to the actor and the positionData object you provided.
+		//Just plug it together!
 		actor.leftArm.position = positionData.leftArm.position
 	}
 
 ###recordFrame()###
-Records a frame from all registered actors.
+Records a frame, saving a positionData object from all registered actors.
 
 ###recordingLength()
 Returns recording length in milliseconds.
