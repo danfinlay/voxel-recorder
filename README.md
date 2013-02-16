@@ -52,21 +52,21 @@ Returns number of significant recorded moments, organized by timestamp.
 ###currentFrame()
 Returns current time stamp in milliseconds.
 
-##jumpToTime(milliseconds)
+###jumpToTime(milliseconds)
 Calls all actors' playback callbacks at the specified time.
 
 ##jumpToKeyframe(keyFrameInteger)
 Calls all actors' playback callbacks at the specified keyframe.
 
-##startPlayback()
+###startPlayback()
 Begins calling back actors' playback callbacks from the current keyframe.
 
-##pausePlayback()
+###pausePlayback()
 
-##loop(boolean)
+###loop(boolean)
 Whether or not the animation should loop when completing.
 
-##resetPlayback()
+###resetPlayback()
 
-##playbackSpeed(speed)
+###playbackSpeed(speed)
 A positive or negative number representing the speed at which to play back when playing.
