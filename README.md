@@ -67,7 +67,10 @@ Returns recording length in milliseconds.
 Returns number of significant recorded moments, organized by timestamp.
 
 ###currentFrame()
-Returns current time stamp in milliseconds.
+Returns current frame number.
+
+###currentTime()
+Returns current animation time in milliseconds (recordings start at 0).
 
 ###jumpToTime(milliseconds)
 Calls all actors' playback callbacks at the specified time.

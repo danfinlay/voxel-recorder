@@ -21,6 +21,9 @@ exports.register = function(actor, recordingMethod, playbackMethod){
 exports.startRecording = function(){
 	isRecording = true
 	timeStartedRecording = Date.now()
+	actors.forEach(function(actor){
+		this.removePerformanceBy(actor)
+	})
 }
 exports.stopRecording = function(){
 	isRecording = false
@@ -53,6 +56,10 @@ exports.keyframeCount = function(){
 
 exports.currentFrame = function(){
 	return frame
+}
+
+exports.currentTime = function(){
+	return recording[frame].time
 }
 
 exports.jumpToTime = function(ms){
