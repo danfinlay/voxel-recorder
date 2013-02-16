@@ -2,7 +2,12 @@ var recording = [],
 	actors = [],
 	frame = 0,
 	isRecording = false,
-	isPlaying = false
+	isPlaying = false,
+	loop = false,
+	speed = 1,
+	recordingLength = 0,
+	timeStartedRecording = timeStartedPlaying = Date.now(),
+	playingFromFrame = 0
 
 exports.register = function(actor, recordingMethod, playbackMethod){
 	actors.push({
@@ -10,6 +15,15 @@ exports.register = function(actor, recordingMethod, playbackMethod){
 		recordingMethod:recordingMethod,
 		playbackMethod:playbackMethod
 	})
+}
+
+exports.startRecording = function(){
+	isRecording = true
+	timeStartedRecording = Date.now()
+}
+exports.stopRecording = function(){
+	isRecording = false
+	recordingLength = recording[recording.length-1].time
 }
 
 var recordFrame = function(){
@@ -21,7 +35,7 @@ var recordFrame = function(){
 		positions.push(position)
 	})
 	var keyframe = {
-		time:Date.now(),
+		time:Date.now()-timeStartedRecording,
 		positions:positions
 	}
 	recording.push(keyframe)
@@ -63,4 +77,69 @@ exports.jumpToKeyframe = function(frameNumber){
 
 exports.startPlayback = function(){
 	isPlaying = true
+	isRecording = false
+	timeStartedPlaying = Date.now()
+	playingFromFrame = frame
+}
+
+exports.pausePlayback = function(){
+	isPlaying = false
+}
+
+exports.loop = function(shouldLoop){
+	loop = shouldLoop
+}
+
+exports.resetPlayback = function(){
+	frame = 0
+}
+
+exports.playbackSpeed = function(desiredSpeed){
+	speed = desiredSpeed
+}
+
+exports.clearRecording = function(){
+	recording = []
+}
+
+var preserveAllFrames = false
+exports.frameSafe = function(safeOrNot){
+	preserveAllFrames = safeOrNot
+}
+
+exports.tick = function(){
+	if(recording){
+		recordFrame()
+	}else if(playing){
+		if(preserveAllFrames){
+			frame+=1
+			assumePosition
+		}else{
+			var progress = (Date.now() - timeStartedPlaying) * speed
+			var target = (recording[playingFromFrame].time + progress)
+			
+			if(loop){
+				if(target<0){
+					while(target<0){
+						target+=recordingLength
+				}
+				if(target > recordingLength){
+					while(target > recordingLength){
+						target -= recordingLength
+					}
+				}
+			}else{ 
+				if(target > recordingLength || target < 0){
+					isPlaying = false
+				}else{
+					for(var i=0; i<recording.length; i++){
+						if(recording[i].time>=target){
+							assumePosition()
+							break
+						}
+					}
+				}
+			}
+		}
+	}
 }

@@ -83,3 +83,6 @@ A positive or negative number representing the speed at which to play back when 
 
 ###tick()
 Must be called each frame for animation to be captured or performances to be displayed.
+
+###frameSafe(bool)
+Tells playback engine whether to render every frame regardless of time or not.  Defaults to false, preserving timing accuracy.
