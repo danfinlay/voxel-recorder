@@ -6,7 +6,11 @@
 	recorder.register(voxelSkinA, recordingMethod, playbackMethod)
 
 	function recordingMethod(actor){
-		return actor.leftArm.position
+		return {
+			'leftArm':{
+				'position':actor.leftArm.position
+			}
+		}
 	}
 
 	function playbackMethod(actor, positionData){
