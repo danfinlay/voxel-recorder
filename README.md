@@ -6,15 +6,13 @@
 	recorder.register(voxelSkinA, recordingMethod, playbackMethod)
 
 	function recordingMethod(actor){
-		return {
-			'leftArm':{
-				'position':actor.leftArm.position
+		return actor.leftArm.position
 			}
 		}
 	}
 
 	function playbackMethod(actor, positionData){
-		actor.leftArm.position = positionData.leftArm.position
+		actor.leftArm.position = positionData
 	}
 
 	//call recordPositions() with each moment that should be recorded.
@@ -35,17 +33,13 @@ Registers an actor with a callback for recording and playing back.
 		//Includes a reference to the recorded actor.
 		//You should return an object that your actor will use
 		//to reenact its current position.
-		return {
-			'leftArm':{
-					'position':actor.leftArm.position
-				}
-			}
+		return actor.leftArm.position
 	}
 
 	function playbackMethod(actor, positionData){
 		//Includes a reference both to the actor and the positionData object you provided.
 		//Just plug it together!
-		actor.leftArm.position = positionData.leftArm.position
+		actor.leftArm.position = positionData
 	}
 
 ###recordFrame()###
