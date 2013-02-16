@@ -18,17 +18,6 @@
 		recorder.recordPositions()
 	}
 
-
-
-###Actors can provide their own protocols:
-	var recorder = require('voxel-recorder')
-	recorder.register(voxelSkinA, voxelSkinA.positionData())
-
-	//PositionData is defined by the user when recording that actor's position.
-	function recordingMethod(positionData){
-		voxelSkinA.leftArm.position = positionData.leftArm.position
-	}
-
 ##API##
 ###register(actor, recordingCallback, playbackCallback)
 Registers an actor with a callback for recording and playing back.
