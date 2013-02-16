@@ -143,3 +143,25 @@ exports.tick = function(){
 		}
 	}
 }
+
+exports.unregister = function(actor){
+	var remaining = []
+	for(var i=0; i<actors.length; i++){
+		if(actors[i]!==actor){
+			remaining.push(actors[i])
+		}
+	}
+	actors = remaining
+}
+
+exports.removePerformanceBy = function(actor){
+	for(var i=0; i<recording.length; i++){
+		var remainingPositions = []
+		for(var f=0; f<recording[i].positions.length; f++){
+			if(recording[i].positions[f].actor !== actor){
+				remainingPositions.push(recording[i].positions[f])
+			}
+		}
+		recording[i].positions = remainingPositions
+	}
+}

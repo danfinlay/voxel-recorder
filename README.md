@@ -1,8 +1,11 @@
-#Voxel Recorder#
-##A module for recording motion and events through time in Voxel.js##
+#Recordling
+##A package for recording performances and playing them back again.
+Originally designed for use with [Voxel.js](http://voxeljs.com) motion capture using my own [voxel-zigfu](https://github.com/flyswatter/voxel-zigfu#readme), but then I realized its API was open-ended enough that it could potentially be a recorder for anything.
+
+The name is a tribute to Substack, and because I needed a vague name once I realized it was flexible.
 
 ###Example
-	var recorder = require('voxel-recorder')
+	var recorder = require('animation-recorder')
 	recorder.register(voxelSkinA, recordingMethod, playbackMethod)
 
 	function recordingMethod(actor){
@@ -86,3 +89,9 @@ Must be called each frame for animation to be captured or performances to be dis
 
 ###frameSafe(bool)
 Tells playback engine whether to render every frame regardless of time or not.  Defaults to false, preserving timing accuracy.
+
+###unregister(actor)
+Stops recording the given actor in subsequent recordings.
+
+###removePerformanceBy(actor)
+Removes any performance by the given actor.
