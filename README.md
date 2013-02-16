@@ -1,8 +1,6 @@
-#Recordling
+#Animatron
 ##A package for recording performances and playing them back again.
 Originally designed for use with [Voxel.js](http://voxeljs.com) motion capture using my own [voxel-zigfu](https://github.com/flyswatter/voxel-zigfu#readme), I found its API was open-ended enough that it could potentially be a recorder for anything.
-
-The name is a tribute to Substack.
 
 ###Example
 	var recorder = require('animation-recorder')
