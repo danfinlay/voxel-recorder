@@ -7,8 +7,6 @@
 
 	function recordingMethod(actor){
 		return actor.leftArm.position
-			}
-		}
 	}
 
 	function playbackMethod(actor, positionData){
