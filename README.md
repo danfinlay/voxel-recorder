@@ -13,13 +13,20 @@
 		actor.leftArm.position = positionData
 	}
 
-	//call recordPositions() with each moment that should be recorded.
+	//Call the tick function each render cycle:
 	function renderTick(){
-		recording ? recorder.recordPositions()
+		recorder.tick()
 	}
 
+	//Start and stop recording like this:
+	recorder.startRecording()
+	recorder.stopRecording()
+
 	//When done recording, play it back.
+	//Make sure you aren't updating the position
+	//With any other methods:
 	recorder.jumpToTime(0)
+	recorder.loop(true)
 	recorder.startPlayback()
 
 ##API##
@@ -40,8 +47,9 @@ Registers an actor with a callback for recording and playing back.
 		actor.leftArm.position = positionData
 	}
 
-###recordFrame()###
-Records a frame, saving a positionData object from all registered actors.
+###startRecording()
+
+###stopRecording()
 
 ###recordingLength()
 Returns recording length in milliseconds.
@@ -70,3 +78,8 @@ Whether or not the animation should loop when completing.
 
 ###playbackSpeed(speed)
 A positive or negative number representing the speed at which to play back when playing.
+
+###clearRecording()
+
+###tick()
+Must be called each frame for animation to be captured or performances to be displayed.
