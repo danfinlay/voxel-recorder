@@ -55,7 +55,7 @@ Returns current time stamp in milliseconds.
 ###jumpToTime(milliseconds)
 Calls all actors' playback callbacks at the specified time.
 
-##jumpToKeyframe(keyFrameInteger)
+###jumpToKeyframe(keyFrameInteger)
 Calls all actors' playback callbacks at the specified keyframe.
 
 ###startPlayback()
