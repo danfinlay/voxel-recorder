@@ -13,10 +13,14 @@
 		actor.leftArm.position = positionData.leftArm.position
 	}
 
-	//call recordPositions() with each interesting moment.
+	//call recordPositions() with each moment that should be recorded.
 	function renderTick(){
-		recorder.recordPositions()
+		recording ? recorder.recordPositions()
 	}
+
+	//When done recording, play it back.
+	recorder.jumpToTime(0)
+	recorder.startPlayback()
 
 ##API##
 ###register(actor, recordingCallback, playbackCallback)
