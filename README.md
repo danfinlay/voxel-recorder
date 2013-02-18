@@ -1,10 +1,9 @@
 #Animatron
 ##A package for recording performances and playing them back again.
-Originally designed for use with [Voxel.js](http://voxeljs.com) motion capture using my own [voxel-zigfu](https://github.com/flyswatter/voxel-zigfu#readme), I found its API was open-ended enough that it could potentially be a recorder for anything.
 
 ###Example
-	var recorder = require('animation-recorder')
-	recorder.register(voxelSkinA, recordingMethod, playbackMethod)
+	var animatron = require('animatron')
+	animatron.register(actor1, recordingMethod, playbackMethod)
 
 	function recordingMethod(actor){
 		return actor.leftArm.position
@@ -14,21 +13,25 @@ Originally designed for use with [Voxel.js](http://voxeljs.com) motion capture u
 		actor.leftArm.position = positionData
 	}
 
-	//Call the tick function each render cycle:
+	//Call the tick function each frame:
 	function renderTick(){
-		recorder.tick()
+		animatron.tick()
 	}
 
 	//Start and stop recording like this:
-	recorder.startRecording()
-	recorder.stopRecording()
+	animatron.startRecording()
+	animatron.stopRecording()
 
 	//When done recording, play it back.
 	//Make sure you aren't updating the position
 	//With any other methods:
-	recorder.jumpToTime(0)
-	recorder.loop(true)
-	recorder.startPlayback()
+	animatron.jumpToTime(0)
+	animatron.loop(true)
+	animatron.startPlayback()
+
+	//Save your recording or open it again:
+	animatron.saveRecording('myrecording.json')
+	animatron.openRecording('./myrecording.json')
 
 ##API##
 ###register(actor, recordingCallback, playbackCallback)
@@ -51,6 +54,10 @@ Registers an actor with a callback for recording and playing back.
 ###startRecording()
 
 ###stopRecording()
+
+###saveRecording(filename, cb(err))
+
+###openRecording(filePath, cb(err))
 
 ###unregister(actor)
 Stops recording the given actor in subsequent recordings.

@@ -6,7 +6,6 @@
   	"type":"git",
   	"url":"https://github.com/flyswatter/voxel-recorder"
   	},
-  "dependencies": {},
   "author":{
   	"name":"Dan Finlay",
   	"email":"dan@danfinlay.com",

@@ -1,4 +1,5 @@
-var recording = [],
+var fs = require('fs'),
+	recording = [],
 	actors = [],
 	frame = 0,
 	isRecording = false,
@@ -28,6 +29,31 @@ exports.startRecording = function(){
 exports.stopRecording = function(){
 	isRecording = false
 	recordingLength = recording[recording.length-1].time
+}
+
+exports.saveRecording = function(filename, cb){
+	fs.writeFile(filename|'recording'+Math.ceil(Math.random()*1000)+'.json',
+		JSON.stringify(recording),
+		function(err){
+			if(err){
+				cb("Save failed!")
+			}else{
+				cb(null)
+				console.log("Save succeeded.")
+			}
+		}
+	)
+}
+
+exports.openRecording = function(filename, cb){
+	fs.readFile(filename, function(err, data){
+		if(err){
+			cb("File open failed")
+		}else{
+			recording = JSON.parse(data)
+			cb(null)
+		}
+	})
 }
 
 var recordFrame = function(){
