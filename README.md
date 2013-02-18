@@ -1,5 +1,6 @@
 #Animatron
-##A package for recording performances and playing them back again.
+##A simple animation package that lets you record and play back anything that can be measured and controlled using your own functions and your own data structures, and can even handle saving and loading them as JSON files.
+###Currently a single Animatron will only manage a single actor's performance, although you can fit as much data as you like in each frame, so you could probably hack more.  It's your processor speed!  I would personally make an animatron for each actor I wanted animated.
 
 ###Example
 	var animatron = require('animatron')
@@ -35,7 +36,7 @@
 
 ##API##
 ###register(actor, recordingCallback, playbackCallback)
-Registers an actor with a callback for recording and playing back.
+Registers an actor as the performer, with callback functions for recording and playing back.
 
 	function recordingCallback(actor){
 
@@ -53,17 +54,15 @@ Registers an actor with a callback for recording and playing back.
 
 ###startRecording()
 
+###tick()
+Must be called each frame for animation to be captured.  Playback timing, however, is handled internally, to emulate the timing of the original tick calls.  Currently there is no tweening, but eventually it would be nice, don't you think?
+
 ###stopRecording()
 
 ###saveRecording(filename, cb(err))
 
 ###openRecording(filePath, cb(err))
-
-###unregister(actor)
-Stops recording the given actor in subsequent recordings.
-
-###removePerformanceBy(actor)
-Removes any performance by the given actor.
+	Loads a performance from file, allowing the registered actor to perform it.
 
 ###recordingLength()
 Returns recording length in milliseconds.
@@ -97,9 +96,3 @@ Whether or not the animation should loop when completing.
 A positive or negative number representing the speed at which to play back when playing.
 
 ###clearRecording()
-
-###tick()
-Must be called each frame for animation to be captured or performances to be displayed.
-
-###frameSafe(bool)
-Tells playback engine whether to render every frame regardless of time or not.  Defaults to true, neglecting timing accuracy but staying wary of what is probably a pretty sketchy playback attempt.  I would only turn this on if I had a really amazing computer to try it on.

@@ -1,6 +1,8 @@
 var fs = require('fs'),
-	recording = [],
-	actors = [],
+	recording = null,
+	actor,
+	recordingMethod,
+	playbackMethod,
 	frame = 0,
 	isRecording = false,
 	isPlaying = false,
@@ -12,23 +14,27 @@ var fs = require('fs'),
 	preserveAllFrames = false
 
 exports.register = function(actor, recordingMethod, playbackMethod){
-	actors.push({
-		actor:actor,
-		recordingMethod:recordingMethod,
-		playbackMethod:playbackMethod
-	})
+	actor:actor
+	recordingMethod:recordingMethod
+	playbackMethod:playbackMethod
 }
 
 exports.startRecording = function(){
-	isRecording = true
-	timeStartedRecording = Date.now()
-	actors.forEach(function(actor){
-		this.removePerformanceBy(actor)
-	})
+	if(!isRecording && recording){
+		var response = confirm("Recording will erase previous performance.  Continue?")
+		if(response){
+			isRecording = true
+			timeStartedRecording = Date.now()
+			recording = []
+			return isRecording
+		}
+	}
+	return isRecording
 }
 exports.stopRecording = function(){
 	isRecording = false
 	recordingLength = recording[recording.length-1].time
+	return isRecording
 }
 
 exports.saveRecording = function(filename, cb){
@@ -45,7 +51,7 @@ exports.saveRecording = function(filename, cb){
 	)
 }
 
-exports.openRecording = function(filename, cb){
+exports.loadRecordingOnActor = function(filename, cb){
 	fs.readFile(filename, function(err, data){
 		if(err){
 			cb("File open failed")
@@ -57,23 +63,17 @@ exports.openRecording = function(filename, cb){
 }
 
 var recordFrame = function(){
-	var positions = []
-	actors.forEach(function(actor){
-		var position = {}
-		position.data = actor.recordingMethod(actor)
-		position.actor = actor
-		positions.push(position)
-	})
+	var theTime = Date.now()-timeStartedRecording
 	var keyframe = {
-		time:Date.now()-timeStartedRecording,
-		positions:positions
+		time:theTime,
+		position:recordingMethod(actor)
 	}
 	recording.push(keyframe)
 	frame = recording.length-1
 }
 
 exports.recordingLength = function(){
-	return recording[recording.length-1].time-recording[0].time
+	return recording[recording.length-1].time
 }
 
 exports.keyframeCount = function(){
@@ -99,9 +99,7 @@ exports.jumpToTime = function(ms){
 }
 
 function assumePosition(){
-	recording[frame].positions.forEach(function(position){
-		position.actor.playbackMethod(actor, position.data)
-	})
+	playbackMethod(actor, recording[frame].position)
 }
 
 exports.jumpToKeyframe = function(frameNumber){
@@ -109,11 +107,26 @@ exports.jumpToKeyframe = function(frameNumber){
 	assumePosition()
 }
 
+var frameAssumed = 0
 exports.startPlayback = function(){
 	isPlaying = true
 	isRecording = false
 	timeStartedPlaying = Date.now()
 	playingFromFrame = frame
+	while(frame < recording.length){
+		if(!isPlaying){
+			break
+		}else{
+			if(frameAssumed!==frame){
+				assumePosition()
+				frameAssumed = frame
+				var interval = recording[frame+1].time-recording[frame].time
+				var timeout = setTimeout(function(){
+					frame++
+				}, interval)
+			}
+		}
+	}
 }
 
 exports.pausePlayback = function(){
@@ -137,64 +150,17 @@ exports.clearRecording = function(){
 }
 
 exports.frameSafe = function(safeOrNot){
-	preserveAllFrames = safeOrNot
+	preserveAllFrames = true
+	//Avoiding the temporarily deprecated commented pit below.
 }
 
 exports.tick = function(){
-	if(recording){
+	if(isRecording){
 		recordFrame()
-	}else if(playing){
-		if(preserveAllFrames){
-			frame+=1
-			assumePosition
-		}else{
-			var progress = (Date.now() - timeStartedPlaying) * speed
-			var target = (recording[playingFromFrame].time + progress)
-			
-			if(loop){
-				if(target<0){
-					while(target<0){
-						target+=recordingLength
-				}
-				if(target > recordingLength){
-					while(target > recordingLength){
-						target -= recordingLength
-					}
-				}
-			}else{ 
-				if(target > recordingLength || target < 0){
-					isPlaying = false
-				}else{
-					for(var i=0; i<recording.length; i++){
-						if(recording[i].time>=target){
-							assumePosition()
-							break
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
 exports.unregister = function(actor){
-	var remaining = []
-	for(var i=0; i<actors.length; i++){
-		if(actors[i]!==actor){
-			remaining.push(actors[i])
-		}
-	}
-	actors = remaining
+	actor = undefined
 }
-
-exports.removePerformanceBy = function(actor){
-	for(var i=0; i<recording.length; i++){
-		var remainingPositions = []
-		for(var f=0; f<recording[i].positions.length; f++){
-			if(recording[i].positions[f].actor !== actor){
-				remainingPositions.push(recording[i].positions[f])
-			}
-		}
-		recording[i].positions = remainingPositions
-	}
-}
+exports.removePerformanceBy = removePerformanceBy

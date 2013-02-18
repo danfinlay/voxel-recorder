@@ -1,7 +1,6 @@
 var createGame = require('voxel-engine')
 var voxel = require('voxel')
 var texturePath = require('painterly-textures')(__dirname)
-
 var game = createGame({
   startingPosition: [0, 200, 0],
   generate: voxel.generator['Valley'],
@@ -10,12 +9,45 @@ var game = createGame({
   worldOrigin: [0, 0, 0],
   controls: { discreteFire: true }
 })
-
 window.game = game // for debugging
-
 var container = document.querySelector('#container')
-
 game.appendTo(container)
+
+var kinect = require('./voxel-zigfu')
+var skin = require('minecraft-skin')
+window.dan = skin(game.THREE, 'danf.png')
+var danObject = dan.mesh
+kinect.puppeteer(dan)
+game.scene.add(danObject)
+game.addItem(dan)
+dan.mesh.position.y=50
+
+//Setting up Animatron here:
+window.recorder = require('../')
+recorder.register(dan, recordingMethod, playbackMethod)
+function recordingMethod(actor){
+	return recorder.currentPosition()
+}
+function playbackMethod(actor, positionData){
+	["leftArm","rightArm",
+	"leftLeg","rightLeg",
+	"body","head"].forEach(function(bodyPart){
+		actor[bodyPart].useQuaternian = true
+		actor[bodyPart].setFromAxisAngle(positionData[bodyPart][0],positionData[bodyPart][1])
+	})
+}
+
+kinect.onUpdate(function(){
+	console.log("Kinect update triggering tick")
+	recorder.tick()
+})
+
+window.addEventListener('keydown', function (ev) {
+	if (ev.keyCode === 'R'.charCodeAt(0)) substack.toggle()
+	if (ev.keyCode === 'S'.charCodeAt(0)) {
+
+	}
+})
 
 //Giving navigation to the game using voxel-player:
 var player = require('voxel-player')
@@ -24,48 +56,8 @@ window.substack = createPlayer('substack.png')
 substack.position.set(5,180,5)
 substack.possess()
 
-//Attempting to combine voxel-zigfu with the game:
-var kinect = require('voxel-zigfu')
-var skin = require('minecraft-skin')
-
-window.dan = skin(game.THREE, 'danf.png')
-
-var danObject = dan.createPlayerObject()
-kinect.puppeteer(dan)
-game.scene.add(danObject)
-game.addItem(dan)
-dan.mesh.position.y=50
-//Previous attempts:
-
-// var puppet = require('../zigfuPuppet')
-// //My attempt to emulate the voxel-player api to find the problem:
-// var createPuppet = puppet(game)
-// window.dan = createPuppet('danf.png')
-// dan.mesh.position.y = 60
-// game.scene.add(dan)
-
-// var kinect = require('voxel-zigfu')
-// var skin = require('../minecraft-skin')
-// window.dan = skin(game.THREE, 'danf.png')
-// dan.mesh.position.y = 60
-// game.scene.add(dan.createPlayerObject())
-// kinect.puppeteer(dan)
-
-
-// var viking = skin(THREE, 'viking.png')
-// viking.mesh.position.y = 50
-// game.scene.add(viking.mesh)
-
-//window.dan = skin(THREE, 'danf.png')
-// window.dan = createPlayer('danf.png')
-// dan.position.set(0, 62, 0)
-// kinect.puppeteer(dan)
-//game.scene.add(dan.createPlayerObject())
-
 // toggle between first and third person modes
-window.addEventListener('keydown', function (ev) {
-  if (ev.keyCode === 'R'.charCodeAt(0)) substack.toggle()
-})
+
 
 // block interaction stuff
 // var highlight = highlighter(game)
