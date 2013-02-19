@@ -20,41 +20,79 @@ var danObject = dan.mesh
 kinect.puppeteer(dan)
 game.scene.add(danObject)
 game.addItem(dan)
-dan.mesh.position.y=50
+dan.mesh.position.y=60
+
+game.camera.position = new THREE.Vector3(59, 69, 0)
+game.camera.rotation = new THREE.Vector3(0,1.5,0)
 
 //Setting up Animatron here:
 window.recorder = require('../')
 recorder.register(dan, recordingMethod, playbackMethod)
 function recordingMethod(actor){
-	return recorder.currentPosition()
+	return kinect.currentPosition()
 }
+var bodyParts = ["leftArm","rightArm", "leftLeg","rightLeg", "upperBody", "playerGroup","head"]
 function playbackMethod(actor, positionData){
-	["leftArm","rightArm",
-	"leftLeg","rightLeg",
-	"body","head"].forEach(function(bodyPart){
-		actor[bodyPart].useQuaternian = true
-		actor[bodyPart].setFromAxisAngle(positionData[bodyPart][0],positionData[bodyPart][1])
-	})
+	if(actor && positionData){
+			//console.log("Playing Back with "+actor)
+		bodyParts.forEach(function(bodyPart){
+			//console.log("Attempting to request "+bodyPart+" of "+actor)
+			actor[bodyPart].useQuaternian = true
+			actor[bodyPart].quaternion.setFromAxisAngle(positionData[bodyPart][0],positionData[bodyPart][1])
+			return true
+		})
+	}else{
+		console.log("Skipped a frame.")
+		return false
+	}
 }
+recorder.loop(true)
 
 kinect.onUpdate(function(){
-	console.log("Kinect update triggering tick")
 	recorder.tick()
 })
 
+var kinectMode = true
+var recording = false
+var playing = false
 window.addEventListener('keydown', function (ev) {
-	if (ev.keyCode === 'R'.charCodeAt(0)) substack.toggle()
-	if (ev.keyCode === 'S'.charCodeAt(0)) {
-
+	if (ev.keyCode === 'R'.charCodeAt(0)){
+		if(!recording){
+			recording = recorder.startRecording()
+		}else{
+			recording = recorder.stopRecording()
+		}
+		console.log("Recording set to "+recording)
+	}
+	if (ev.keyCode === 'K'.charCodeAt(0)) {
+		if(kinectMode){
+			kinectMode=false
+			kinect.setActive(false)
+		}else{
+			kinectMode=true
+			kinect.setActive(true)
+		}
+		console.log("Kinect mode set to "+kinectMode)
+	}
+	if (ev.keyCode === 'P'.charCodeAt(0)) {
+		if(playing){
+			playing=false
+			recorder.pausePlayback()
+		}else{
+			playing=true
+			recorder.startPlayback()
+		}
+		console.log("Playing set to "+playing)
 	}
 })
 
 //Giving navigation to the game using voxel-player:
-var player = require('voxel-player')
-var createPlayer = player(game)
-window.substack = createPlayer('substack.png')
-substack.position.set(5,180,5)
-substack.possess()
+// var createPlayer = require('voxel-player')(game)
+// window.substack = createPlayer('substack.png')
+// substack.possess()
+
+// substack.position.set(5,250,5)
+
 
 // toggle between first and third person modes
 

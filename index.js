@@ -1,6 +1,6 @@
 var fs = require('fs'),
 	recording = null,
-	actor,
+	actor={},
 	recordingMethod,
 	playbackMethod,
 	frame = 0,
@@ -13,10 +13,15 @@ var fs = require('fs'),
 	playingFromFrame = 0,
 	preserveAllFrames = false
 
-exports.register = function(actor, recordingMethod, playbackMethod){
-	actor:actor
-	recordingMethod:recordingMethod
-	playbackMethod:playbackMethod
+exports.register = function(newActor, newRecordingMethod, newPlaybackMethod){
+	actor=newActor
+	console.log("Actor sett to "+actor)
+	recordingMethod=newRecordingMethod
+	playbackMethod=newPlaybackMethod
+}
+
+exports.data = function(){
+	return recording
 }
 
 exports.startRecording = function(){
@@ -28,12 +33,17 @@ exports.startRecording = function(){
 			recording = []
 			return isRecording
 		}
+	}else if(!isRecording && !recording){
+		isRecording = true
+		timeStartedRecording = Date.now()
+		recording = []
 	}
 	return isRecording
 }
 exports.stopRecording = function(){
 	isRecording = false
-	recordingLength = recording[recording.length-1].time
+	if(recording.length>0) recordingLength = recording[recording.length-1].time
+	frame = 0
 	return isRecording
 }
 
@@ -101,32 +111,52 @@ exports.jumpToTime = function(ms){
 function assumePosition(){
 	playbackMethod(actor, recording[frame].position)
 }
+exports.assumePosition = assumePosition
 
 exports.jumpToKeyframe = function(frameNumber){
 	frame = frameNumber
 	assumePosition()
 }
 
+function assumeFrame(aFrame){
+	return playbackMethod(actor, recording[aFrame].position)
+}
+exports.assumeFrame=assumeFrame
+
 var frameAssumed = 0
 exports.startPlayback = function(){
 	isPlaying = true
 	isRecording = false
 	timeStartedPlaying = Date.now()
-	playingFromFrame = frame
-	while(frame < recording.length){
-		if(!isPlaying){
-			break
-		}else{
-			if(frameAssumed!==frame){
-				assumePosition()
-				frameAssumed = frame
-				var interval = recording[frame+1].time-recording[frame].time
-				var timeout = setTimeout(function(){
-					frame++
-				}, interval)
+	playingFromFrame = 0
+	frame=0
+	frameAssumed = recording.length
+
+	for(var i=0; i<recording.length; i++){
+		var time = Math.ceil((recording[frame+i]['time']-recording[frame]['time'])/speed)
+		setTimeout(function(){
+
+			if(frame===recording.length-1){
+				isPlaying=false
 			}
-		}
+			assumeFrame(++frame)
+		}, time)
 	}
+
+	// while(frame < recording.length){
+	// 	if(!isPlaying){
+	// 		break
+	// 	}else{
+	// 		if(frameAssumed!==frame){
+	// 			frameAssumed = frame
+	// 			assumePosition()
+	// 			var interval = recording[frame+1]['time']-recording[frame]['time']
+	// 			var timeout = setTimeout(function(){
+	// 				frame++
+	// 			}, Math.ceil(interval/speed))
+	// 		}
+	// 	}
+	// }
 }
 
 exports.pausePlayback = function(){
@@ -135,6 +165,7 @@ exports.pausePlayback = function(){
 
 exports.loop = function(shouldLoop){
 	loop = shouldLoop
+	return loop
 }
 
 exports.resetPlayback = function(){
@@ -163,4 +194,3 @@ exports.tick = function(){
 exports.unregister = function(actor){
 	actor = undefined
 }
-exports.removePerformanceBy = removePerformanceBy
