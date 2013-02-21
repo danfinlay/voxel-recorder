@@ -16,9 +16,8 @@ game.appendTo(container)
 var kinect = require('./voxel-zigfu')
 var skin = require('minecraft-skin')
 window.dan = skin(game.THREE, 'danf.png')
-var danObject = dan.mesh
 kinect.puppeteer(dan)
-game.scene.add(danObject)
+game.scene.add(dan.mesh)
 game.addItem(dan)
 dan.mesh.position.y=60
 
@@ -27,10 +26,8 @@ game.camera.rotation = new THREE.Vector3(0,1.5,0)
 
 //Setting up Animatron here:
 window.recorder = require('../')
-recorder.register(dan, recordingMethod, playbackMethod)
-function recordingMethod(actor){
-	return kinect.currentPosition()
-}
+recorder.register(dan, kinect.currentPosition, playbackMethod)
+
 var bodyParts = ["leftArm","rightArm", "leftLeg","rightLeg", "upperBody", "playerGroup","head"]
 function playbackMethod(actor, positionData){
 	if(actor && positionData){
@@ -38,7 +35,12 @@ function playbackMethod(actor, positionData){
 		bodyParts.forEach(function(bodyPart){
 			//console.log("Attempting to request "+bodyPart+" of "+actor)
 			actor[bodyPart].useQuaternian = true
-			actor[bodyPart].quaternion.setFromAxisAngle(positionData[bodyPart][0],positionData[bodyPart][1])
+			//console.log("Using quaternian?")
+			var quat = actor[bodyPart].quaternion.setFromAxisAngle(positionData[bodyPart][0], positionData[bodyPart][1])
+			
+			if(bodyPart === "head"){
+				//console.log("Quat set: "+JSON.stringify(quat))
+			}
 			return true
 		})
 	}else{

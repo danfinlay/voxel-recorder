@@ -19,6 +19,9 @@
 		animatron.tick()
 	}
 
+	//One could instead also refer to these pre-defined playback methods within voxel-zigfu and voxel-recorder:
+	animatron.register(actor1, voxel-zigfu.currentPosition, animatron.minecraftSkinPlayback)
+
 	//Start and stop recording like this:
 	animatron.startRecording()
 	animatron.stopRecording()

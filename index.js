@@ -1,6 +1,6 @@
 var fs = require('fs'),
 	recording = null,
-	actor={},
+	actor,
 	recordingMethod,
 	playbackMethod,
 	frame = 0,
@@ -125,6 +125,9 @@ exports.assumeFrame=assumeFrame
 
 var frameAssumed = 0
 exports.startPlayback = function(){
+
+	
+
 	isPlaying = true
 	isRecording = false
 	timeStartedPlaying = Date.now()
@@ -135,11 +138,16 @@ exports.startPlayback = function(){
 	for(var i=0; i<recording.length; i++){
 		var time = Math.ceil((recording[frame+i]['time']-recording[frame]['time'])/speed)
 		setTimeout(function(){
-
+			frame++
+			assumeFrame(frame)
 			if(frame===recording.length-1){
-				isPlaying=false
+				if(loop){
+					frame=0
+					i=1
+				}else{
+					isPlaying=false
+				}
 			}
-			assumeFrame(++frame)
 		}, time)
 	}
 
@@ -188,6 +196,22 @@ exports.frameSafe = function(safeOrNot){
 exports.tick = function(){
 	if(isRecording){
 		recordFrame()
+	}
+}
+
+var bodyParts = ["leftArm","rightArm", "leftLeg","rightLeg", "upperBody", "playerGroup","head"]
+exports.minecraftSkinPlayback = function(actor, positionData){
+	if(actor && positionData){
+		bodyParts.forEach(function(bodyPart){
+			actor[bodyPart].useQuaternian = true
+			var quat = actor[bodyPart].quaternion.setFromAxisAngle(positionData[bodyPart][0], positionData[bodyPart][1])
+			if(bodyPart === "head"){
+			}
+			return true
+		})
+	}else{
+		console.log("Skipped a frame.")
+		return false
 	}
 }
 
