@@ -1,4 +1,3 @@
-var fs = require('fs'),
 	recording = null,
 	actor,
 	recordingMethod,
@@ -126,7 +125,10 @@ exports.assumeFrame=assumeFrame
 var frameAssumed = 0
 exports.startPlayback = function(){
 
-	
+
+
+
+
 
 	isPlaying = true
 	isRecording = false
@@ -196,6 +198,22 @@ exports.frameSafe = function(safeOrNot){
 exports.tick = function(){
 	if(isRecording){
 		recordFrame()
+	}
+	if(isPlaying){
+		frame = returnFrameNearest(recording[frame].time+)
+		assumeFrame()
+	}
+}
+
+function returnFrameNearest(comparedTime){
+	var bestGuess = 0
+	var guessDistance = recording.length
+	for(var i=0; i<recording.length; i++){
+		var frameDistance = Math.abs(recording[i].time-comparedTime)
+		if(frameDistance<guessDistance){
+			bestGuess=i
+			guessDistance = frameDistance
+		}
 	}
 }
 
