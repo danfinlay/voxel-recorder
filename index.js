@@ -123,35 +123,34 @@ function assumeFrame(aFrame){
 exports.assumeFrame=assumeFrame
 
 var frameAssumed = 0
+var lastTickTime
+var recLength = 0
 exports.startPlayback = function(){
-
-
-
-
-
 
 	isPlaying = true
 	isRecording = false
-	timeStartedPlaying = Date.now()
-	playingFromFrame = 0
+	lastTickTime = Date.now()
+	var recLength = recordingLength()
+	//Pull this out once proper scrubbing exists:
 	frame=0
-	frameAssumed = recording.length
 
-	for(var i=0; i<recording.length; i++){
-		var time = Math.ceil((recording[frame+i]['time']-recording[frame]['time'])/speed)
-		setTimeout(function(){
-			frame++
-			assumeFrame(frame)
-			if(frame===recording.length-1){
-				if(loop){
-					frame=0
-					i=1
-				}else{
-					isPlaying=false
-				}
-			}
-		}, time)
-	}
+	//frameAssumed = recording.length
+
+	// for(var i=0; i<recording.length; i++){
+	// 	var time = Math.ceil((recording[frame+i]['time']-recording[frame]['time'])/speed)
+	// 	setTimeout(function(){
+	// 		frame++
+	// 		assumeFrame(frame)
+	// 		if(frame===recording.length-1){
+	// 			if(loop){
+	// 				frame=0
+	// 				i=1
+	// 			}else{
+	// 				isPlaying=false
+	// 			}
+	// 		}
+	// 	}, time)
+	// }
 
 	// while(frame < recording.length){
 	// 	if(!isPlaying){
@@ -195,13 +194,23 @@ exports.frameSafe = function(safeOrNot){
 	//Avoiding the temporarily deprecated commented pit below.
 }
 
+var playbackTime = 0
 exports.tick = function(){
 	if(isRecording){
 		recordFrame()
 	}
 	if(isPlaying){
-		frame = returnFrameNearest(recording[frame].time+)
+		playbackTime += (Date.now()-lastTickTime)*speed
+		if(0 > playbackTime || playbackTime > recLength){
+			if(0 > playbackTime){
+				playbackTime+=recLength
+			}else{
+				playbackTime-=recLength
+			}
+		}
+		frame = returnFrameNearest(playbackTime)
 		assumeFrame()
+		lastTickTime = Date.now()
 	}
 }
 
