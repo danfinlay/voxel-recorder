@@ -232,8 +232,6 @@ exports.minecraftSkinPlayback = function(actor, positionData){
 		bodyParts.forEach(function(bodyPart){
 			actor[bodyPart].useQuaternian = true
 			var quat = actor[bodyPart].quaternion.setFromAxisAngle(positionData[bodyPart][0], positionData[bodyPart][1])
-			if(bodyPart === "head"){
-			}
 			return true
 		})
 	}else{

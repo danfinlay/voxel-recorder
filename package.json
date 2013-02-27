@@ -1,7 +1,7 @@
 {
   "name": "animatron",
   "description":"Record and playback anything that varies but you can control.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "repository":{
   	"type":"git",
   	"url":"https://github.com/flyswatter/voxel-recorder"

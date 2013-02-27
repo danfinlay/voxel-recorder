@@ -26,28 +26,10 @@ game.camera.rotation = new THREE.Vector3(0,1.5,0)
 
 //Setting up Animatron here:
 window.recorder = require('../')
-recorder.register(dan, kinect.currentPosition, playbackMethod)
+recorder.register(dan, kinect.currentPosition, recorder.minecraftSkinPlayback)
 
 var bodyParts = ["leftArm","rightArm", "leftLeg","rightLeg", "upperBody", "playerGroup","head"]
-function playbackMethod(actor, positionData){
-	if(actor && positionData){
-			//console.log("Playing Back with "+actor)
-		bodyParts.forEach(function(bodyPart){
-			//console.log("Attempting to request "+bodyPart+" of "+actor)
-			actor[bodyPart].useQuaternian = true
-			//console.log("Using quaternian?")
-			var quat = actor[bodyPart].quaternion.setFromAxisAngle(positionData[bodyPart][0], positionData[bodyPart][1])
-			
-			if(bodyPart === "head"){
-				//console.log("Quat set: "+JSON.stringify(quat))
-			}
-			return true
-		})
-	}else{
-		console.log("Skipped a frame.")
-		return false
-	}
-}
+
 recorder.loop(true)
 
 kinect.onUpdate(function(){
@@ -88,21 +70,6 @@ window.addEventListener('keydown', function (ev) {
 	}
 })
 
-//Giving navigation to the game using voxel-player:
-// var createPlayer = require('voxel-player')(game)
-// window.substack = createPlayer('substack.png')
-// substack.possess()
-
-// substack.position.set(5,250,5)
-
-
-// toggle between first and third person modes
-
-
-// block interaction stuff
-// var highlight = highlighter(game)
 var currentMaterial = 1
-
-
 
 module.exports = game
