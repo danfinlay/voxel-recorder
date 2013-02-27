@@ -21,6 +21,7 @@ game.scene.add(dan.mesh)
 game.addItem(dan)
 dan.mesh.position.y=60
 
+
 game.camera.position = new THREE.Vector3(59, 69, 0)
 game.camera.rotation = new THREE.Vector3(0,1.5,0)
 
@@ -35,6 +36,8 @@ recorder.loop(true)
 kinect.onUpdate(function(){
 	recorder.tick()
 })
+
+game.addItem(recorder)
 
 var kinectMode = true
 var recording = false

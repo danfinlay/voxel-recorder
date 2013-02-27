@@ -1,5 +1,6 @@
-	recording = null,
+var recording = null,
 	actor,
+	actors,
 	recordingMethod,
 	playbackMethod,
 	frame = 0,
@@ -7,7 +8,7 @@
 	isPlaying = false,
 	loop = false,
 	speed = 1,
-	recordingLength = 0,
+	recLength = 0,
 	timeStartedRecording = timeStartedPlaying = Date.now(),
 	playingFromFrame = 0,
 	preserveAllFrames = false
@@ -17,6 +18,17 @@ exports.register = function(newActor, newRecordingMethod, newPlaybackMethod){
 	console.log("Actor sett to "+actor)
 	recordingMethod=newRecordingMethod
 	playbackMethod=newPlaybackMethod
+}
+
+var Performer = function(anActor, aRecordingMethod, aPlaybackMethod){
+	this.actor = anActor
+	this.recordingMethod = aRecordingMethod
+	this.playbackMethod = aPlaybackMethod
+	this.loop = true
+	this.recordMode = true
+	this.playMode = true
+	this.recording = []
+	return this
 }
 
 exports.data = function(){
@@ -41,7 +53,7 @@ exports.startRecording = function(){
 }
 exports.stopRecording = function(){
 	isRecording = false
-	if(recording.length>0) recordingLength = recording[recording.length-1].time
+	if(recording.length>0) recLength = recording[recording.length-1].time
 	frame = 0
 	return isRecording
 }
@@ -81,7 +93,7 @@ var recordFrame = function(){
 	frame = recording.length-1
 }
 
-exports.recordingLength = function(){
+recordingLength = function(){
 	return recording[recording.length-1].time
 }
 
@@ -107,8 +119,9 @@ exports.jumpToTime = function(ms){
 	}
 }
 
+
 function assumePosition(){
-	playbackMethod(actor, recording[frame].position)
+	playbackMethod(actor, recording[frame]['position'])
 }
 exports.assumePosition = assumePosition
 
@@ -117,8 +130,8 @@ exports.jumpToKeyframe = function(frameNumber){
 	assumePosition()
 }
 
-function assumeFrame(aFrame){
-	return playbackMethod(actor, recording[aFrame].position)
+function assumeFrame(){
+	playbackMethod(actor, recording[frame]['position'])
 }
 exports.assumeFrame=assumeFrame
 
@@ -130,42 +143,9 @@ exports.startPlayback = function(){
 	isPlaying = true
 	isRecording = false
 	lastTickTime = Date.now()
-	var recLength = recordingLength()
+	recLength = recordingLength()
 	//Pull this out once proper scrubbing exists:
 	frame=0
-
-	//frameAssumed = recording.length
-
-	// for(var i=0; i<recording.length; i++){
-	// 	var time = Math.ceil((recording[frame+i]['time']-recording[frame]['time'])/speed)
-	// 	setTimeout(function(){
-	// 		frame++
-	// 		assumeFrame(frame)
-	// 		if(frame===recording.length-1){
-	// 			if(loop){
-	// 				frame=0
-	// 				i=1
-	// 			}else{
-	// 				isPlaying=false
-	// 			}
-	// 		}
-	// 	}, time)
-	// }
-
-	// while(frame < recording.length){
-	// 	if(!isPlaying){
-	// 		break
-	// 	}else{
-	// 		if(frameAssumed!==frame){
-	// 			frameAssumed = frame
-	// 			assumePosition()
-	// 			var interval = recording[frame+1]['time']-recording[frame]['time']
-	// 			var timeout = setTimeout(function(){
-	// 				frame++
-	// 			}, Math.ceil(interval/speed))
-	// 		}
-	// 	}
-	// }
 }
 
 exports.pausePlayback = function(){
@@ -224,18 +204,23 @@ function returnFrameNearest(comparedTime){
 			guessDistance = frameDistance
 		}
 	}
+	return bestGuess
 }
 
 var bodyParts = ["leftArm","rightArm", "leftLeg","rightLeg", "upperBody", "playerGroup","head"]
 exports.minecraftSkinPlayback = function(actor, positionData){
 	if(actor && positionData){
 		bodyParts.forEach(function(bodyPart){
-			actor[bodyPart].useQuaternian = true
-			var quat = actor[bodyPart].quaternion.setFromAxisAngle(positionData[bodyPart][0], positionData[bodyPart][1])
-			return true
+			if(positionData[bodyPart][0]&&positionData[bodyPart][1]){
+				actor[bodyPart].useQuaternian = true
+				var quat = actor[bodyPart].quaternion.setFromAxisAngle(positionData[bodyPart][0], positionData[bodyPart][1])
+				return true
+			}else{
+				return false
+			}
 		})
 	}else{
-		console.log("Skipped a frame.")
+		//console.log("Skipped a frame.")
 		return false
 	}
 }
